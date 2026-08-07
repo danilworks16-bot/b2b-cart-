@@ -254,7 +254,7 @@ export function OrderBuilder() {
                 disabled={locked}
                 className="h-11 flex-1 bg-transparent text-[14px] font-medium"
               >
-                Запросить котировку
+                {isGuest ? 'Войти в B2B-аккаунт' : 'Запросить котировку'}
               </Button>
               <Button
                 variant="ghost"
