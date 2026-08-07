@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
-import { ChevronDown, Package, Truck } from 'lucide-react'
+import { Package, Truck } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { formatAmount, formatTierRange } from '@/lib/b2b/format'
+import { formatAmount } from '@/lib/b2b/format'
+import { resolveTier, resolveUnitAmount } from '@/lib/b2b/pricing'
 import type { HtCustomerCtx, HtVariant } from '@/lib/b2b/types'
 import { QuantityStepper } from './quantity-stepper'
 
@@ -31,22 +31,12 @@ export function VariantRow({
   locked: boolean
   onQuantityChange: (next: number) => void
 }) {
-  const [tiersOpen, setTiersOpen] = useState(false)
-
   const isB2B = customer.state === 'b2b'
   const isLoading = customer.state === 'loading'
   const inventory = STATE_COPY[variant.inventory_state]
 
-  // Активная ступень выбирается по введённому количеству — как это делает
-  // price rule `quantity` на price set в Medusa v2.
-  const activeTier =
-    isB2B && quantity > 0
-      ? [...variant.price_tiers]
-          .reverse()
-          .find((tier) => quantity >= tier.min_quantity) ?? variant.price_tiers[0]
-      : variant.price_tiers[0]
-
-  const unitAmount = isB2B ? activeTier.amount : variant.calculated_price.calculated_amount
+  const activeTier = resolveTier(variant, quantity, isB2B)
+  const unitAmount = resolveUnitAmount(variant, quantity, isB2B)
   const isSelected = quantity > 0
 
   return (
@@ -108,61 +98,6 @@ export function VariantRow({
             </div>
           </dl>
 
-          {/* Оптовая сетка — только для авторизованного B2B-контекста */}
-          {isB2B && (
-            <div className="mt-3">
-              <button
-                type="button"
-                onClick={() => setTiersOpen((open) => !open)}
-                aria-expanded={tiersOpen}
-                className="inline-flex items-center gap-1 rounded-md text-[12.5px] font-medium text-primary transition-opacity duration-150 hover:opacity-70"
-              >
-                Оптовая сетка · от {variant.price_tiers.at(-1)?.min_quantity} ед.
-                <ChevronDown
-                  className={cn(
-                    'size-3.5 transition-transform duration-200 ease-out',
-                    tiersOpen && 'rotate-180',
-                  )}
-                  strokeWidth={2}
-                  aria-hidden="true"
-                />
-              </button>
-
-              {tiersOpen && (
-                <table className="animate-in fade-in slide-in-from-top-1 mt-2.5 w-full text-left duration-200 ease-out">
-                  <thead>
-                    <tr className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
-                      <th scope="col" className="pb-1.5 font-medium">
-                        Количество
-                      </th>
-                      <th scope="col" className="pb-1.5 text-right font-medium">
-                        Цена за ед.
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="ht-numeric text-[13px]">
-                    {variant.price_tiers.map((tier) => {
-                      const isActiveTier = tier.min_quantity === activeTier.min_quantity && quantity > 0
-                      return (
-                        <tr
-                          key={tier.min_quantity}
-                          className={cn(
-                            'border-t border-border/70',
-                            isActiveTier && 'font-semibold text-primary',
-                          )}
-                        >
-                          <td className="py-1.5">
-                            {formatTierRange(tier.min_quantity, tier.max_quantity)}
-                          </td>
-                          <td className="py-1.5 text-right">{formatAmount(tier.amount)}</td>
-                        </tr>
-                      )
-                    })}
-                  </tbody>
-                </table>
-              )}
-            </div>
-          )}
         </div>
 
         <div className="flex shrink-0 flex-col items-end gap-1.5">

@@ -50,6 +50,10 @@ export type HtVariant = {
   /** метрики упаковки, в b2b-starter лежат в variant.metadata */
   metadata: {
     net_weight_kg: number
+    /** вес с тарой — нужен для расчёта загрузки контейнера */
+    gross_weight_kg: number
+    /** объём одной единицы фасовки, м³ */
+    volume_m3: number
     units_per_pallet: number
     lead_time_days: number
     grade: string

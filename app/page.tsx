@@ -1,9 +1,8 @@
 import { ChevronRight } from 'lucide-react'
 import { CaseStudies } from '@/components/b2b/case-studies'
 import { CustomerProvider } from '@/components/b2b/customer-context'
-import { ProductGallery } from '@/components/b2b/product-gallery'
+import { OrderBuilder } from '@/components/b2b/order-builder'
 import { ProductInfo } from '@/components/b2b/product-info'
-import { PurchasePanel } from '@/components/b2b/purchase-panel'
 import { RelatedProducts } from '@/components/b2b/related-products'
 import { SiteFooter } from '@/components/b2b/site-footer'
 import { SiteHeader } from '@/components/b2b/site-header'
@@ -15,7 +14,7 @@ export default function ProductPage() {
     <CustomerProvider>
       <SiteHeader />
 
-      <main className="mx-auto max-w-[1160px] px-4 pb-20">
+      <main className="mx-auto max-w-[1160px] px-4 pb-24">
         <nav aria-label="Хлебные крошки" className="py-6">
           <ol className="flex flex-wrap items-center gap-1.5 text-[12.5px] text-muted-foreground">
             {['Каталог', product.collection.title].map((crumb) => (
@@ -32,12 +31,7 @@ export default function ProductPage() {
           </ol>
         </nav>
 
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,440px)] lg:gap-14">
-          <div className="lg:sticky lg:top-24 lg:self-start">
-            <ProductGallery images={product.images} />
-          </div>
-          <PurchasePanel product={product} />
-        </div>
+        <OrderBuilder product={product} />
 
         <div className="mt-16 flex flex-col gap-16">
           <ProductInfo product={product} />
