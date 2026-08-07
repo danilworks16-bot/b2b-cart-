@@ -1,52 +1,22 @@
 'use client'
 
-import { useMemo, useState } from 'react'
-import { Building2, Loader2, Lock, ShieldCheck, ShoppingCart } from 'lucide-react'
+import { Building2, ArrowDown, Loader2, Lock, ShieldCheck } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { formatAmount } from '@/lib/b2b/format'
 import type { HtProduct } from '@/lib/b2b/types'
 import { useCustomer } from './customer-context'
+import { useOrderDraft } from './order-draft-context'
 import { VariantRow } from './variant-row'
 
 export function PurchasePanel({ product }: { product: HtProduct }) {
   const { customer, isRecalculating } = useCustomer()
-  const [quantities, setQuantities] = useState<Record<string, number>>({})
+  const { quantities, draft, setQuantity } = useOrderDraft()
 
   const isLoading = customer.state === 'loading'
   const isGuest = customer.state === 'guest'
   const isB2B = customer.state === 'b2b'
   const locked = isLoading || isRecalculating
-
-  const summary = useMemo(() => {
-    let lines = 0
-    let units = 0
-    let total = 0
-    let netWeight = 0
-
-    for (const variant of product.variants) {
-      const quantity = quantities[variant.id] ?? 0
-      if (quantity <= 0) continue
-
-      const tier =
-        isB2B
-          ? [...variant.price_tiers].reverse().find((t) => quantity >= t.min_quantity) ??
-            variant.price_tiers[0]
-          : variant.price_tiers[0]
-
-      lines += 1
-      units += quantity
-      total += tier.amount * quantity
-      netWeight += variant.metadata.net_weight_kg * quantity
-    }
-
-    return { lines, units, total, netWeight }
-  }, [quantities, product.variants, isB2B])
-
-  const overLimit =
-    isB2B && customer.state === 'b2b'
-      ? customer.employee.spent + summary.total > customer.employee.spending_limit
-      : false
 
   const basePrice = Math.min(...product.variants.map((v) => v.calculated_price.calculated_amount))
 
@@ -137,68 +107,61 @@ export function PurchasePanel({ product }: { product: HtProduct }) {
             customer={customer}
             locked={locked}
             quantity={quantities[variant.id] ?? 0}
-            onQuantityChange={(next) =>
-              setQuantities((prev) => ({ ...prev, [variant.id]: next }))
-            }
+            onQuantityChange={(next) => setQuantity(variant.id, next)}
           />
         ))}
       </div>
 
-      {/* Итог заявки: высота зарезервирована, поэтому появление не сдвигает страницу */}
-      <div className="min-h-[112px]">
+      {/* Мост к расчёту заявки: итог и действие живут в одном месте — в OrderBuilder */}
+      <div className="min-h-[92px]">
         <div
           className={cn(
-            'rounded-xl border p-4 transition-colors duration-200',
-            summary.lines > 0 ? 'border-border bg-muted/50' : 'border-dashed border-input',
+            'flex items-center gap-4 rounded-xl border p-4 transition-colors duration-200',
+            draft.lines_count > 0 ? 'border-border bg-muted/50' : 'border-dashed border-input',
           )}
         >
-          <dl className="ht-numeric grid grid-cols-3 gap-3 text-[12.5px]">
-            <div>
-              <dt className="text-muted-foreground">Позиций</dt>
-              <dd className="mt-0.5 font-display text-[15px] font-semibold">{summary.lines}</dd>
-            </div>
-            <div>
-              <dt className="text-muted-foreground">Нетто</dt>
-              <dd className="mt-0.5 font-display text-[15px] font-semibold">
-                {summary.netWeight} кг
-              </dd>
-            </div>
-            <div className="text-right">
-              <dt className="text-muted-foreground">Сумма</dt>
-              <dd className="mt-0.5 font-display text-[15px] font-semibold">
-                {summary.total > 0 ? formatAmount(summary.total) : '—'}
-              </dd>
-            </div>
+          <dl className="ht-numeric min-w-0 flex-1">
+            <dt className="text-[12.5px] text-muted-foreground">
+              {draft.lines_count > 0
+                ? `В заявке ${draft.lines_count} из ${draft.variants_count} позиций`
+                : 'Заявка пока пуста'}
+            </dt>
+            <dd className="mt-0.5 font-display text-[18px] font-semibold tracking-[-0.02em]">
+              {isLoading ? (
+                <span className="block h-5 w-24 animate-pulse rounded bg-muted" />
+              ) : (
+                formatAmount(draft.total)
+              )}
+            </dd>
           </dl>
 
-          {overLimit && (
-            <p className="mt-3 rounded-lg bg-primary-soft px-2.5 py-2 text-[12px] leading-snug text-primary">
-              Сумма превышает лимит сотрудника — заявка уйдёт на согласование администратору компании.
-            </p>
-          )}
+          <Button
+            variant="outline"
+            size="sm"
+            disabled={locked}
+            onClick={() =>
+              document
+                .getElementById('order-builder')
+                ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            }
+            className="shrink-0 bg-transparent text-[13px] font-medium"
+          >
+            {isRecalculating ? (
+              <>
+                <Loader2 className="size-3.5 animate-spin" aria-hidden="true" />
+                Пересчёт…
+              </>
+            ) : (
+              <>
+                К расчёту
+                <ArrowDown className="size-3.5" strokeWidth={2} aria-hidden="true" />
+              </>
+            )}
+          </Button>
         </div>
       </div>
 
-      {/* Действия */}
       <div className="flex flex-col gap-2.5">
-        <Button
-          size="lg"
-          disabled={locked || summary.lines === 0}
-          className="h-11 w-full text-[14px] font-semibold transition-transform duration-100 ease-out active:scale-[0.99]"
-        >
-          {isRecalculating ? (
-            <>
-              <Loader2 className="size-4 animate-spin" aria-hidden="true" />
-              Пересчёт цен…
-            </>
-          ) : (
-            <>
-              <ShoppingCart className="size-4" strokeWidth={2} aria-hidden="true" />
-              {isGuest ? 'Запросить котировку' : 'Добавить в заявку'}
-            </>
-          )}
-        </Button>
-
         <Button
           variant="outline"
           size="lg"
@@ -209,7 +172,9 @@ export function PurchasePanel({ product }: { product: HtProduct }) {
         </Button>
 
         <p className="text-pretty text-[12px] leading-relaxed text-muted-foreground">
-          {product.metadata.commercial_terms}
+          {isGuest
+            ? 'Гостевой доступ: цены по запросу. Полная сетка и лимиты открываются после входа в B2B-аккаунт.'
+            : product.metadata.commercial_terms}
         </p>
       </div>
     </section>

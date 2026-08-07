@@ -1,9 +1,12 @@
 import { ChevronRight } from 'lucide-react'
 import { CaseStudies } from '@/components/b2b/case-studies'
 import { CustomerProvider } from '@/components/b2b/customer-context'
+import { OrderBuilder } from '@/components/b2b/order-builder'
+import { OrderDraftProvider } from '@/components/b2b/order-draft-context'
 import { ProductGallery } from '@/components/b2b/product-gallery'
 import { ProductInfo } from '@/components/b2b/product-info'
 import { PurchasePanel } from '@/components/b2b/purchase-panel'
+import { VariantMatrix } from '@/components/b2b/variant-matrix'
 import { RelatedProducts } from '@/components/b2b/related-products'
 import { SiteFooter } from '@/components/b2b/site-footer'
 import { SiteHeader } from '@/components/b2b/site-header'
@@ -13,7 +16,8 @@ import { product, relatedProducts } from '@/lib/b2b/mock-data'
 export default function ProductPage() {
   return (
     <CustomerProvider>
-      <SiteHeader />
+      <OrderDraftProvider product={product}>
+        <SiteHeader />
 
       <main className="mx-auto max-w-[1160px] px-4 pb-20">
         <nav aria-label="Хлебные крошки" className="py-6">
@@ -39,6 +43,15 @@ export default function ProductPage() {
           <PurchasePanel product={product} />
         </div>
 
+        {/* Матрица фасовок + расчёт заявки: полная ширина, потому что 7 колонок
+            B2B-параметров и три блока итога не читаются в узкой правой колонке */}
+        <div className="mt-14 flex flex-col gap-6">
+          <VariantMatrix product={product} />
+          <div id="order-builder" className="scroll-mt-28">
+            <OrderBuilder />
+          </div>
+        </div>
+
         <div className="mt-16 flex flex-col gap-16">
           <ProductInfo product={product} />
           <CaseStudies cases={product.case_studies} />
@@ -46,8 +59,9 @@ export default function ProductPage() {
         </div>
       </main>
 
-      <SiteFooter />
-      <StateSwitcher />
+        <SiteFooter />
+        <StateSwitcher />
+      </OrderDraftProvider>
     </CustomerProvider>
   )
 }
