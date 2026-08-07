@@ -17,7 +17,8 @@ export function StateSwitcher() {
   ]
 
   return (
-    <div className="fixed bottom-4 left-1/2 z-50 -translate-x-1/2">
+    // приподнят над sticky-панелью заявки
+    <div className="fixed bottom-[max(5.25rem,calc(env(safe-area-inset-bottom)+5.25rem))] left-1/2 z-50 -translate-x-1/2">
       <div className="flex items-center gap-1.5 rounded-full border border-border bg-card/85 p-1.5 pl-3.5 shadow-lift backdrop-blur-xl backdrop-saturate-150">
         <span className="hidden text-[11.5px] font-medium uppercase tracking-wide text-muted-foreground sm:inline">
           Состояние

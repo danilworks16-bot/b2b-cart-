@@ -43,6 +43,8 @@ export const product: HtProduct = {
       ],
       metadata: {
         net_weight_kg: 5,
+        gross_weight_kg: 5.4,
+        volume_m3: 0.009,
         units_per_pallet: 96,
         lead_time_days: 7,
         grade: 'Standard',
@@ -77,6 +79,8 @@ export const product: HtProduct = {
       ],
       metadata: {
         net_weight_kg: 20,
+        gross_weight_kg: 20.8,
+        volume_m3: 0.028,
         units_per_pallet: 32,
         lead_time_days: 10,
         grade: 'Premium',
@@ -111,6 +115,8 @@ export const product: HtProduct = {
       ],
       metadata: {
         net_weight_kg: 25,
+        gross_weight_kg: 26,
+        volume_m3: 0.0355,
         units_per_pallet: 24,
         lead_time_days: 14,
         grade: 'Export',
