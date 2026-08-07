@@ -1,0 +1,155 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+@import 'shadcn/tailwind.css';
+
+/* ------------------------------------------------------------------
+   Homtree B2B — design tokens
+   Light-only palette (white canvas is a hard requirement).
+   Every token below maps 1:1 to a Tailwind utility, so the markup can
+   be copied into the Medusa v2 B2B starter without extra CSS.
+------------------------------------------------------------------- */
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-soft: var(--primary-soft);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, sans-serif;
+
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.35);
+  --radius-2xl: calc(var(--radius) * 1.75);
+
+  --shadow-panel: 0 1px 2px 0 rgb(22 22 26 / 0.04), 0 8px 24px -12px rgb(22 22 26 / 0.12);
+  --shadow-lift: 0 1px 2px 0 rgb(22 22 26 / 0.05), 0 18px 40px -18px rgb(22 22 26 / 0.18);
+}
+
+:root {
+  color-scheme: light;
+
+  --background: #ffffff;
+  --foreground: #16161a;
+
+  --card: #ffffff;
+  --card-foreground: #16161a;
+  --popover: #ffffff;
+  --popover-foreground: #16161a;
+
+  /* Homtree corporate wine-red */
+  --primary: #8e1b3c;
+  --primary-foreground: #ffffff;
+  --primary-soft: #fbf1f4;
+
+  --secondary: #f6f6f7;
+  --secondary-foreground: #16161a;
+
+  --muted: #f7f7f8;
+  --muted-foreground: #6c6c75;
+
+  --accent: #f2f2f4;
+  --accent-foreground: #16161a;
+
+  --success: #0f7a52;
+  --success-soft: #edf8f2;
+
+  --destructive: #b3261e;
+
+  --border: #e8e8ec;
+  --input: #dfdfe4;
+  --ring: #8e1b3c;
+
+  --radius: 0.75rem;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+    font-feature-settings: 'cv11', 'ss01';
+  }
+
+  /* Optical typography: tighter tracking as type grows (Apple-style) */
+  h1,
+  h2,
+  h3 {
+    @apply font-display;
+    letter-spacing: -0.021em;
+  }
+
+  h1 {
+    letter-spacing: -0.028em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Tabular figures everywhere prices / SKUs / quantities appear */
+  .ht-numeric {
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: 'tnum';
+  }
+}
+
+/* Controlled horizontal scroll used by B2B spec tables */
+.ht-scroll-x {
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scrollbar-width: thin;
+  scrollbar-color: var(--input) transparent;
+}
+.ht-scroll-x::-webkit-scrollbar {
+  height: 8px;
+}
+.ht-scroll-x::-webkit-scrollbar-thumb {
+  background: var(--input);
+  border-radius: 999px;
+}
+
+/* Snap rail for the case-study carousel */
+.ht-snap-x {
+  scroll-snap-type: x mandatory;
+}
+.ht-snap-x > * {
+  scroll-snap-align: start;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
