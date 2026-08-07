@@ -26,6 +26,18 @@ export function formatQuantity(value: number, unit = 'кг') {
   return `${new Intl.NumberFormat(LOCALE).format(value)} ${unit}`
 }
 
+/** Числа с фиксированной точностью: 13,60 м³ / 10 400,0 кг */
+export function formatDecimal(value: number, fractionDigits = 2) {
+  return new Intl.NumberFormat(LOCALE, {
+    minimumFractionDigits: fractionDigits,
+    maximumFractionDigits: fractionDigits,
+  }).format(value)
+}
+
+export function formatInteger(value: number) {
+  return new Intl.NumberFormat(LOCALE).format(value)
+}
+
 export function formatTierRange(min: number, max: number | null) {
   if (max === null) return `${new Intl.NumberFormat(LOCALE).format(min)}+`
   return `${new Intl.NumberFormat(LOCALE).format(min)}–${new Intl.NumberFormat(LOCALE).format(max)}`

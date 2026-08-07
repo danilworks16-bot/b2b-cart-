@@ -27,6 +27,8 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-success: var(--success);
   --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
   --color-destructive: var(--destructive);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -72,6 +74,10 @@
 
   --success: #0f7a52;
   --success-soft: #edf8f2;
+
+  /* Предупреждение: MOQ и превышение лимита — не ошибка, а условие сделки */
+  --warning: #8a5300;
+  --warning-soft: #fdf5e7;
 
   --destructive: #b3261e;
 
